@@ -77,7 +77,7 @@ test('no bearer cannot obtain download or icon upload',async()=>{
   await download({method:'GET',url:'/api/download?id='+id+'&platform=Windows',headers:{}},a);
   assert.equal(a.statusCode,404);
   const b=res();
-  await iconUpload({method:'POST',body:{id},headers:{}},b);
+  await iconUpload({method:'POST',body:{id,bytes:1024},headers:{}},b);
   assert.equal(b.statusCode,404);
 });
 
