@@ -121,7 +121,7 @@ The repository now includes a Windows x64 Electron/NSIS build pipeline. It can g
 
 - [Run Windows QA workflow manually](https://github.com/helloskyorigin/Warpvio/actions/workflows/windows-qa.yml) (GitHub Actions → Run workflow)
 - [Windows builder documentation](builder/windows/README.md)
-- Source files are in builder/windows, with pinned Electron 44.9.3 and electron-builder 26.15.3 versions.
+- Source files are in builder/windows, with pinned Electron 44.9.3 and electron-builder 26.17.0 versions.
 - The workflow takes a developer-owned HTTPS URL, app name, accent and window size; it will package an **unsigned** Windows x64 NSIS installer and upload an Actions artifact IF the job succeeds.
 - This code was committed but the actual Windows build/run result has not been verified as successful in this session. **Do not advertise an available .exe until the GitHub job produces one and a Windows installation test passes.**
 - The workflow is **not connected to the web customization form**, does not fetch an uploaded browser icon, and does not authorize a paid export. No customer-triggered builds, entitlements or downloads exist.
