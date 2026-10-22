@@ -16,6 +16,9 @@ function validate(body) {
   const site=validateWebsiteUrl(body.site);
   const name=validateAppName(body.name);
   const q=quote(body.platforms);
+  if(q.platforms.includes('Android')&&!/^[A-Za-z0-9][A-Za-z0-9 ._-]*$/.test(name)){
+    throw Object.assign(new Error('Android app names must use ASCII letters, numbers, spaces, dots, hyphens or underscores.'),{status:400});
+  }
   const accent=body.accent||'blue';
   validateAccent(accent);
   const theme=['light','dark','system'].includes(body.theme)?body.theme:'system';
