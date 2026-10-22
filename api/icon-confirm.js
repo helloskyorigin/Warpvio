@@ -15,7 +15,7 @@ module.exports=async function handler(req,res){
     if(!draft.verifiedAt||!draft.customIconNotTransferred)
       return res.status(403).json({ok:false,error:'Icon upload is not pending.'});
     const obj=await iconMetadata(draft.id);
-    if(typeof obj.ContentLength!=='number'||obj.ContentLength<100||obj.ContentLength>1_200_000||
+    if(typeof obj.ContentLength!=='number'||obj.ContentLength<100||obj.ContentLength>1_200_000||obj.ContentLength!==draft.iconBytesExpected||
       !/^image\/png(?:$|;)/i.test(obj.ContentType||'')){
       return res.status(422).json({ok:false,error:'Stored icon is not an acceptable PNG (1.2 MB maximum).'});
     }
@@ -23,6 +23,7 @@ module.exports=async function handler(req,res){
     // The future private builder must re-parse and validate the file.
     draft.iconObjectKey=iconKey(draft.id);
     draft.iconSizeBytes=obj.ContentLength;
+    delete draft.iconBytesExpected;
     draft.customIconNotTransferred=false;
     draft.updatedAt=new Date().toISOString();
     await updateDraft(draft);
