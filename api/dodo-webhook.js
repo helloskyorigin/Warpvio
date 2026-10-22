@@ -2,9 +2,7 @@
 const { verifySignature, receiveRawBody } = require('../lib/dodo-webhook');
 
 // Vercel's default JSON parser changes the signed body. Disable it here.
-module.exports.config={api:{bodyParser:false}};
-
-module.exports=async function webhookHandler(req,res){
+async function webhookHandler(req,res){
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Content-Type-Options','nosniff');
   if(req.method!=='POST'){
@@ -46,4 +44,8 @@ module.exports=async function webhookHandler(req,res){
   }catch{
     return res.status(401).json({ok:false,error:'Webhook signature verification failed.'});
   }
-};
+}
+
+// Retain this property on the exported function so Vercel skips JSON parsing.
+webhookHandler.config={api:{bodyParser:false}};
+module.exports=webhookHandler;
