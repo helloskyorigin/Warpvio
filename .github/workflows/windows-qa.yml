@@ -54,7 +54,7 @@ jobs:
 
       - name: Validate builder logic
         working-directory: builder/windows
-        run: node --test tests/*.test.cjs
+        run: npm test
 
       - name: Generate desktop app config and icon
         working-directory: builder/windows
