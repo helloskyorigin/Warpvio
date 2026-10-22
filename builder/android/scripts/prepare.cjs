@@ -38,6 +38,7 @@ function validateUrl(raw) {
 
 function validateName(raw) {
   if(typeof raw!=='string')throw Error('App name must be text.');
+  if(/[\r\n\0]/.test(raw))throw Error('App name must be a single line.');
   const name=raw.trim().replace(/\s+/g,' ');
   if(name.length<2||name.length>36||!/^[A-Za-z0-9][A-Za-z0-9 ._-]*$/.test(name)||/[. ]$/.test(name)){
     throw Error('QA app name: 2–36 ASCII letters/numbers, spaces, dots, hyphens or underscores.');
