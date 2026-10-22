@@ -9,6 +9,24 @@
     },
     "api/dodo-webhook.js": {
       "maxDuration": 10
+    },
+    "api/order.js": {
+      "maxDuration": 15
+    },
+    "api/order-status.js": {
+      "maxDuration": 15
+    },
+    "api/verify-domain.js": {
+      "maxDuration": 15
+    },
+    "api/icon-upload.js": {
+      "maxDuration": 15
+    },
+    "api/icon-confirm.js": {
+      "maxDuration": 15
+    },
+    "api/download.js": {
+      "maxDuration": 15
     }
   },
   "headers": [
