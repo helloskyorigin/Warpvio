@@ -1,6 +1,6 @@
 # Warpvio — V1 Website Check & App Customization
 
-**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Live payments and customer-facing native exports remain disabled; the Windows builder is developer-only QA.**
+**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Live payments and customer-facing native exports remain disabled; Windows and Android builders are developer-only QA.**
 
 ## Current flow
 
@@ -128,4 +128,21 @@ The repository now includes a Windows x64 Electron/NSIS build pipeline. It can g
 - GitHub repository / Actions artifacts should be treated as potentially public. Only use test websites you own or are permitted to wrap.
 - Windows code signing and Windows SmartScreen trust are not set up. Do not distribute unsigned QA binaries commercially.
 
-**Other platforms:** Android APK and macOS DMG build pipelines remain unimplemented. Do not switch on live Dodo charging before secure, tested build and delivery exists.
+**Other platforms:** Android debug APK source/QA pipeline is available below; macOS DMG remains unimplemented. Do not switch on live Dodo charging before secure, tested build and delivery exists.
+
+
+## Android APK builder — developer QA
+
+Warpvio now includes a separate Android WebView application, brand/icon/orientation configuration generator and GitHub Actions pipeline designed to compile a **debug-key signed installable APK**. It is not a production release build or an automatic paid export.
+
+- [Android QA build workflow](https://github.com/helloskyorigin/Warpvio/actions/workflows/android-qa.yml) — Run workflow on main with a public HTTPS URL you own or are permitted to test.
+- [Android builder documentation](builder/android/README.md) — local build, security restrictions and limitations.
+- Stack: Android Gradle Plugin 8.13.2, Gradle 8.13, JDK 17, Android SDK 35, Node 22 for the config/icon generator.
+- Safe demo smoke builds can run on push changes to builder/android/** using example.com, with APK validation and GitHub artifact upload.
+- WebView enables website JavaScript and DOM storage but denies local file/content access, mixed HTTP, popups, sensitive permissions, file chooser and downloads. Main-frame navigation is limited to the chosen HTTPS origin.
+- A generated native icon, package ID and app name are baked into the APK. Device orientation preference and branded loading/failure/retry states are implemented.
+- The debug APK is signed by Android's development key, **not a production/customer signing key**. Do not sell it, upload it to Google Play or represent it as a released app.
+- The Actions build and actual Android device installation still require independent verification. Code being committed does not mean a tested APK is available.
+- The Warpvio web editor is **not yet connected** to either Android or Windows builders; browser-uploaded icons remain in session storage. There is no authenticated build queue, artifact delivery or payment entitlement.
+
+**macOS DMG builder and production paid exports remain pending.** Secure signing, domain ownership checks, real end-to-end install testing and build orchestration are required before enabling live payments.
