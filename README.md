@@ -1,6 +1,17 @@
 # Warpvio — V1 Website Check & App Customization
 
-**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Live payments and customer-facing native exports remain disabled; Windows, Android and macOS now have developer-only QA build sources.**
+**Status:** Website analysis, customization, unpaid project saving and checkout review source committed. **Windows NSIS, Android debug APK, and macOS Intel/Apple Silicon DMG QA builds have all passed GitHub Actions artifact verification (22 Oct 2026).** Physical device installation, release signing, payment fulfillment and customer downloads remain unverified/unavailable. **Live payments are disabled.**
+
+
+## Verified developer build runs (22 October 2026)
+
+- [Windows x64 installer](https://github.com/helloskyorigin/Warpvio/actions/runs/39734304510) — successful Electron/NSIS QA build and artifact upload
+- [Android debug APK](https://github.com/helloskyorigin/Warpvio/actions/runs/39741956591) — successful Gradle build, apksigner verification and artifact upload
+- [macOS Intel + Apple Silicon DMGs](https://github.com/helloskyorigin/Warpvio/actions/runs/39742174151) — successful build, DMG integrity verification and separate x64/arm64 artifacts
+- [Root CI tests](https://github.com/helloskyorigin/Warpvio/actions/runs/39742174061) — success after fixes
+- [Full QA verification report](docs/qa-build-verification-2026-10-22.md) — known limitations and launch blockers
+
+**Deployment:** Vercel reports project `warpvio` as READY at https://warpvio.vercel.app, but the connected Vercel scope returned 403 when inspecting browser/API output, so real HTTP availability is not confirmed. The deployed commit is `dc2587e`, before some workflow/doc fixes. Secure paid exports and production signing are not ready.
 
 ## Current flow
 
