@@ -17,3 +17,6 @@ jobs:
       - name: Test Windows desktop builder without downloading Electron
         working-directory: builder/windows
         run: npm test
+      - name: Test Android WebView builder input rules and resources
+        working-directory: builder/android
+        run: node --test tests/*.test.cjs
