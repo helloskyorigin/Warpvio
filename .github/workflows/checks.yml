@@ -12,5 +12,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Test website-analysis API
+      - name: Test website-analysis, checkout and app configuration
+        run: npm test
+      - name: Test Windows desktop builder without downloading Electron
+        working-directory: builder/windows
         run: npm test
