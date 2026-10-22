@@ -20,3 +20,7 @@ jobs:
       - name: Test Android WebView builder input rules and resources
         working-directory: builder/android
         run: node --test tests/*.test.cjs
+
+      - name: Test macOS QA builder on Linux without Apple tools
+        working-directory: builder/macos
+        run: npm test
