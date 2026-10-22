@@ -60,6 +60,7 @@ function showReport(draftData){
   els('txt-value').textContent=verified?'Verified':draft.verification.value;
   els('verify').disabled=verified;
   els('copy-value').disabled=verified;
+  els('upload-icon').hidden=!(verified&&draft.customIconNotTransferred&&app?.iconData);
   els('verification-status').textContent=verified?
     'Domain ownership verified. The app build/download service is not yet active.':
     'Not verified yet. Add the TXT record and click Verify.';
@@ -107,12 +108,41 @@ async function verify(){
   }catch(e){els('verification-status').textContent=e.message||'DNS check failed.'}
   finally{b.disabled=!!draft?.verification?.verified}
 }
+async function uploadIcon(){
+  if(!draft?.verification?.verified||!draft.customIconNotTransferred||!app?.iconData){
+    return notice('Select an icon in the app editor and verify domain ownership first.',true);
+  }
+  const btn=els('upload-icon');btn.disabled=true;notice('Uploading your selected 256×256 PNG to private storage…');
+  try{
+    const base64=app.iconData.split(',')[1];
+    if(!base64)throw Error('The selected PNG is missing.');
+    const binary=atob(base64);
+    if(binary.length>1_200_000||binary.length<100)throw Error('The icon must be a PNG under 1.2 MB.');
+    const bytes=Uint8Array.from(binary,ch=>ch.charCodeAt(0));
+    const upload=await api('./api/icon-upload',{
+      method:'POST',headers:{...headerAuth(),'Content-Type':'application/json'},
+      body:JSON.stringify({id:credentials.id})
+    });
+    const put=await fetch(upload.uploadUrl,{
+      method:'PUT',headers:{'Content-Type':'image/png'},
+      body:new Blob([bytes],{type:'image/png'})
+    });
+    if(!put.ok)throw Error('Private icon storage rejected the upload. Check bucket CORS and credentials.');
+    await api('./api/icon-confirm',{
+      method:'POST',headers:{...headerAuth(),'Content-Type':'application/json'},
+      body:JSON.stringify({id:credentials.id})
+    });
+    await refresh();notice('Icon saved in private storage for a future build. No export has been created.');
+  }catch(e){notice(e.message||'Unable to upload icon.',true)}
+  finally{btn.disabled=false}
+}
 async function copy(text){
   if(!navigator.clipboard?.writeText)throw Error('Clipboard permission not available; select the visible TXT value to copy.');
   await navigator.clipboard.writeText(text);
 }
 els('create').addEventListener('click',create);
 els('verify').addEventListener('click',verify);
+els('upload-icon').addEventListener('click',uploadIcon);
 els('refresh').addEventListener('click',async()=>{
   try{await refresh();notice('Status refreshed.')}catch(e){notice(e.message,true)}
 });
