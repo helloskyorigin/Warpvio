@@ -162,7 +162,19 @@ async function boot(){
   const existing=fromHash||safeRead();
   if(validSecret(existing)){
     saveSecret(existing);
-    try{await refresh();return}catch(e){notice(e.message,true)}
+    try{
+      await refresh();
+      const same=(!analysis||!app)||
+        (draft?.site===analysis.finalUrl&&draft?.name===app.name&&
+        Array.isArray(draft?.platforms)&&draft.platforms.join('|')===analysis.platforms.join('|'));
+      if(fromHash||same)return;
+      // The customer changed their website/config; don't show the old draft.
+      sessionStorage.removeItem(key);
+      credentials=null;draft=null;
+      els('save-step').hidden=false;els('saved-step').hidden=true;
+      els('domain-step').hidden=true;
+      notice('');
+    }catch(e){notice(e.message,true)}
   }
   if(!analysis||!app){
     els('missing').hidden=false;
