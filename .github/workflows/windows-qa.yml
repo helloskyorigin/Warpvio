@@ -1,6 +1,10 @@
 name: Windows QA installer (unsigned)
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - "builder/windows/**"
   workflow_dispatch:
     inputs:
       website_url:
@@ -59,10 +63,10 @@ jobs:
       - name: Generate desktop app config and icon
         working-directory: builder/windows
         env:
-          APP_URL: ${{ inputs.website_url }}
-          APP_NAME: ${{ inputs.app_name }}
-          APP_ACCENT: ${{ inputs.accent }}
-          APP_SIZE: ${{ inputs.window_size }}
+          APP_URL: ${{ inputs.website_url || 'https://example.com/' }}
+          APP_NAME: ${{ inputs.app_name || 'Warpvio QA Demo' }}
+          APP_ACCENT: ${{ inputs.accent || 'blue' }}
+          APP_SIZE: ${{ inputs.window_size || 'standard' }}
         run: node scripts/prepare.cjs
 
       - name: Install pinned Electron and packaging tools
