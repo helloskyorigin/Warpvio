@@ -1,12 +1,14 @@
-# Warpvio — V1 Website Analysis
+# Warpvio — V1 Website Check & App Customization
 
-**Status:** Responsive landing + real server-side HTTP/HTML website inspection + evidence-based compatibility result UI. App compilation and payments are **not implemented yet**.
+**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization and order preview. App compilation and payment processing are **not implemented yet**.
 
 ## Current flow
 
 1. Open `index.html`; paste a public website URL and select Windows, Android and/or macOS.
 2. Continue to `analyzing.html`. The page calls `POST /api/analyze` and shows the real request state and actionable errors.
 3. The response is stored in browser session storage; `compatibility.html` renders confirmed findings and clearly labels native behaviors as unverified.
+4. Click **Customize my app** for `customize.html`. Edit app name, upload a PNG/JPG/WebP icon (cropped locally to 256×256), choose accent/theme and configure selected platform preferences.
+5. Click **Continue to preview** to open `preview.html`, which displays the saved design and proposed one-time export price. **No charges, generated files or paid entitlement exist in this phase.**
 
 ### Checks that actually run
 
@@ -44,6 +46,10 @@ There are no third-party runtime dependencies for the analysis function.
 - `index.html` — original no-bubbles landing page, responsive URL/platform selector
 - `analyzing.html` — real request state, retry/error UI
 - `compatibility.html` — confirmed findings + unverified native requirements
+- `customize.html` / `customize.js` / `customize.css` — interactive editor, icon processing and live launch mockup
+- `preview.html` / `preview.js` — configuration summary and pricing estimate, **not** an app build
+- `app-config.js` — same-tab session state validation and persistence
+- `tests/app-config.test.cjs` — customization state and pricing unit tests
 - `flow.css` — shared analysis/results design
 - `api/analyze.js` — Node serverless URL scanner
 - `tests/analyze.test.cjs` — scanner unit/security tests
@@ -53,6 +59,14 @@ There are no third-party runtime dependencies for the analysis function.
 
 - URL scanner only supports public HTTP/HTTPS websites and limits payload size, redirects and request time.
 - The scanner does **not** submit forms or execute a webpage's JavaScript.
-- Analysis results stay in the browser tab's `sessionStorage` for the current flow.
+- Analysis results, app name, preferences and processed PNG icon previews stay in the browser tab's `sessionStorage` for the current flow. The original uploaded icon is not sent to a server.
 - No account, payments or downloadable EXE/APK/DMG are active yet.
 - A public service should enforce durable rate limits/WAF rules, observability and build quotas before selling app exports.
+
+## App customization scope
+
+- The launch mockups intentionally illustrate a **shell**, not your actual website rendered inside a native app.
+- The inferred website title/fallback icon is editable. A user-uploaded icon is converted into a square PNG locally and kept in same-tab storage only; later export workers need a separate safe, durable upload path.
+- Selected platforms come from the analyzed URL; preferences for Windows/macOS window size and Android orientation are only **planned build settings**, not verified artifacts.
+- Pricing shown in preview is an **estimate** from the original launch plan ($15 Windows, $19 Android, $19 macOS, $39 all three), not a live checkout.
+- Back/reload navigation preserves data within the same browser tab. Closing the tab or clearing site data loses the unsaved project draft. There is no account or cross-device recovery yet.
