@@ -63,112 +63,52 @@
     </main>
     <footer class="site-footer"><a class="brand" href="#top" aria-label="Warpvio home"><span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span><span>warpvio<span class="brand-period">.</span></span></a><p>From URL to app, beautifully simple.</p><div class="footer-links"><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="#faq" id="support-link">Help</a></div><div class="copyright">© <span id="year"></span> Warpvio. All rights reserved.</div></footer>
   </div>
-  <div class="modal-backdrop" id="setup-modal" aria-hidden="true"><div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title" tabindex="-1"><button class="modal-close" type="button" aria-label="Close">×</button><div class="modal-icon">↗</div><p class="section-kicker">APP CONFIGURATION</p><h2 id="modal-title">Looking good.</h2><p class="modal-desc">Your website and platform choices are ready for the next step.</p><div class="modal-review"><span>WEBSITE</span><strong id="review-url"></strong><span>PLATFORMS</span><strong id="review-platforms"></strong></div><p class="modal-explain">This is the completed landing page. Compatibility checks and export builds will be connected in the next development phase — no payment or build has started.</p><button class="modal-done" type="button">Back to home</button></div></div>
   <script>
-const selectedPlatforms = new Set(['Windows']);
-const platformButtons = Array.from(document.querySelectorAll('.platform-option'));
-const urlInput = document.querySelector('#website-url');
-const urlError = document.querySelector('#url-error');
-const form = document.querySelector('#convert-form');
-const modal = document.querySelector('#setup-modal');
-const modalPanel = modal.querySelector('.modal-panel');
-let previousFocus = null;
-
-function updateSelection() {
-  platformButtons.forEach(btn => {
-    const selected = selectedPlatforms.has(btn.dataset.platform);
-    btn.classList.toggle('selected', selected);
-    btn.setAttribute('aria-pressed', String(selected));
-  });
+(()=>{
+'use strict';
+const selectedPlatforms=new Set(['Windows']);
+const buttons=[...document.querySelectorAll('.platform-option')];
+const input=document.querySelector('#website-url');
+const error=document.querySelector('#url-error');
+const form=document.querySelector('#convert-form');
+function sync(){buttons.forEach(b=>{const yes=selectedPlatforms.has(b.dataset.platform);b.classList.toggle('selected',yes);b.setAttribute('aria-pressed',String(yes))})}
+buttons.forEach(b=>b.addEventListener('click',()=>{const p=b.dataset.platform;if(selectedPlatforms.has(p)){if(selectedPlatforms.size>1)selectedPlatforms.delete(p)}else selectedPlatforms.add(p);sync()}));
+function validate(value){
+  const text=value.trim();
+  if(!text)return {error:'Enter your website URL to continue.'};
+  try{
+    const u=new URL(/^https?:\/\//i.test(text)?text:'https://'+text);
+    if(!['http:','https:'].includes(u.protocol)||!u.hostname.includes('.')||u.username||u.password||
+      ['localhost','127.0.0.1','0.0.0.0'].includes(u.hostname)||u.hostname.endsWith('.local'))throw Error();
+    return {url:u.href};
+  }catch{return {error:'Enter a public website URL, like https://example.com.'};}
 }
-platformButtons.forEach(btn => btn.addEventListener('click', () => {
-  const item = btn.dataset.platform;
-  if (selectedPlatforms.has(item)) {
-    if (selectedPlatforms.size > 1) selectedPlatforms.delete(item);
-  } else {
-    selectedPlatforms.add(item);
-  }
-  updateSelection();
-}));
-
-function validatedUrl(value) {
-  const trimmed = value.trim();
-  if (!trimmed) return { error: 'Enter your website URL to continue.' };
-  const normalized = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
-  try {
-    const url = new URL(normalized);
-    if (!['http:', 'https:'].includes(url.protocol) || !url.hostname.includes('.') || url.username || url.password) throw Error('Invalid');
-    if (['localhost', '127.0.0.1', '0.0.0.0'].includes(url.hostname) || url.hostname.endsWith('.local')) throw Error('Local');
-    return { url: url.toString() };
-  } catch (_) { return { error: 'Enter a valid public website URL, like https://example.com.' }; }
-}
-function openModal() {
-  previousFocus = document.activeElement;
-  modal.classList.add('open');
-  modal.setAttribute('aria-hidden','false');
-  document.body.style.overflow = 'hidden';
-  modalPanel.focus();
-}
-function closeModal() {
-  modal.classList.remove('open');
-  modal.setAttribute('aria-hidden','true');
-  document.body.style.overflow = '';
-  previousFocus?.focus();
-}
-form.addEventListener('submit', event => {
+form.addEventListener('submit',event=>{
   event.preventDefault();
-  const result = validatedUrl(urlInput.value);
-  if (result.error) {
-    urlInput.setAttribute('aria-invalid','true');
-    urlError.textContent = result.error;
-    urlInput.focus();
-    return;
-  }
-  urlInput.removeAttribute('aria-invalid');
-  urlError.textContent = '';
-  urlInput.value = result.url;
-  document.querySelector('#review-url').textContent = result.url;
-  document.querySelector('#review-platforms').textContent = Array.from(selectedPlatforms).join(' · ');
-  openModal();
+  const data=validate(input.value);
+  if(data.error){input.setAttribute('aria-invalid','true');error.textContent=data.error;input.focus();return;}
+  input.removeAttribute('aria-invalid');error.textContent='';input.value=data.url;
+  try{
+    sessionStorage.setItem('warpvio_v1_request',JSON.stringify({url:data.url,platforms:[...selectedPlatforms]}));
+    sessionStorage.removeItem('warpvio_v1_result');
+  }catch{error.textContent='Your browser is blocking session storage. Enable site storage to continue.';return;}
+  location.assign('./analyzing.html');
 });
-urlInput.addEventListener('input', () => { urlError.textContent=''; urlInput.removeAttribute('aria-invalid'); });
-modal.querySelector('.modal-close').addEventListener('click',closeModal);
-modal.querySelector('.modal-done').addEventListener('click',closeModal);
-modal.addEventListener('click',event=>{if(event.target===modal)closeModal()});
-document.addEventListener('keydown',event=>{
-  if (!modal.classList.contains('open')) return;
-  if (event.key==='Escape') closeModal();
-  if (event.key === 'Tab') {
-    const focusable = Array.from(modal.querySelectorAll('button:not([disabled]),a[href],input:not([disabled])'));
-    const first=focusable[0], last=focusable[focusable.length-1];
-    if (event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
-    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
-  }
+input.addEventListener('input',()=>{error.textContent='';input.removeAttribute('aria-invalid')});
+const menu=document.querySelector('.mobile-menu-btn'),nav=document.querySelector('.mobile-navigation');
+menu.addEventListener('click',()=>{
+  const opened=menu.getAttribute('aria-expanded')==='true';
+  menu.setAttribute('aria-expanded',String(!opened));menu.setAttribute('aria-label',opened?'Open menu':'Close menu');nav.hidden=opened;
 });
-const menuButton=document.querySelector('.mobile-menu-btn');
-const mobileNav=document.querySelector('.mobile-navigation');
-menuButton.addEventListener('click',()=>{
-  const open=menuButton.getAttribute('aria-expanded')==='true';
-  menuButton.setAttribute('aria-expanded',String(!open));
-  menuButton.setAttribute('aria-label',open?'Open menu':'Close menu');
-  mobileNav.hidden=open;
-});
-mobileNav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{
-  mobileNav.hidden=true;menuButton.setAttribute('aria-expanded','false');menuButton.setAttribute('aria-label','Open menu');
-}));
-document.querySelectorAll('.price-button').forEach(button=>button.addEventListener('click',()=>{
-  selectedPlatforms.clear();
-  if(button.dataset.plan==='All') ['Windows','Android','macOS'].forEach(p=>selectedPlatforms.add(p));
-  else selectedPlatforms.add(button.dataset.plan);
-  updateSelection();
-  document.querySelector('#convert').scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
-  setTimeout(()=>urlInput.focus({preventScroll:true}),550);
+nav.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{nav.hidden=true;menu.setAttribute('aria-expanded','false');menu.setAttribute('aria-label','Open menu')}));
+document.querySelectorAll('.price-button').forEach(b=>b.addEventListener('click',()=>{
+  selectedPlatforms.clear();(b.dataset.plan==='All'?['Windows','Android','macOS']:[b.dataset.plan]).forEach(x=>selectedPlatforms.add(x));
+  sync();document.querySelector('#convert').scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});input.focus({preventScroll:true});
 }));
 document.querySelector('#year').textContent=new Date().getFullYear();
-const revealObserver='IntersectionObserver' in window?new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting){entry.target.classList.add('visible');revealObserver.unobserve(entry.target)}})},{threshold:.1}):null;
-document.querySelectorAll('.reveal').forEach(el=>revealObserver?revealObserver.observe(el):el.classList.add('visible'));
-
-
+const o='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');o.unobserve(e.target)}}),{threshold:.1}):null;
+document.querySelectorAll('.reveal').forEach(e=>o?o.observe(e):e.classList.add('visible'));
+})();
 </script>
 </body>
 </html>
