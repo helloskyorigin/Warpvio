@@ -68,3 +68,10 @@ Do not enable live checkout or a public builder endpoint until domain ownership 
 - tests/builder.test.cjs — security and packaging unit tests
 - package.json — pinned Electron and electron-builder dependencies
 - repo root .github/workflows/windows-qa.yml — manual CI installer pipeline
+
+
+## Automated safe smoke build on code changes
+
+Updates to files under builder/windows/ on main also trigger this same workflow with fixed public test defaults (https://example.com/, Warpvio QA Demo, blue, standard). This exercises the Windows NSIS packager without customer input or any payment. GitHub Actions must be enabled and the run must succeed before there is an actual downloadable artifact.
+
+A demo installer artifact produced by CI should be treated as a temporary unsigned developer sample, not a production export. Build runs may fail because of dependency downloads, runner changes or packaging errors; inspect the Actions logs before advertising functionality.
