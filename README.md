@@ -1,6 +1,6 @@
 # Warpvio — V1 Website Check & App Customization
 
-**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Real payments and native exports remain disabled.**
+**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Live payments and customer-facing native exports remain disabled; the Windows builder is developer-only QA.**
 
 ## Current flow
 
@@ -114,3 +114,18 @@ Do **not** switch to live mode yet. Complete and end-to-end test all the followi
 6. Test-mode payment + refunds + failed builds + webhook redelivery end to end; only then implement a separately audited production live checkout path.
 
 **Do not charge customers for files Warpvio cannot actually generate and deliver.**
+
+## Windows installer builder — developer QA
+
+The repository now includes a Windows x64 Electron/NSIS build pipeline. It can generate an app shell that loads the chosen public HTTPS website, with a branded app name, Windows icon, sandboxed renderer and restricted permissions.
+
+- [Run Windows QA workflow manually](https://github.com/helloskyorigin/Warpvio/actions/workflows/windows-qa.yml) (GitHub Actions → Run workflow)
+- [Windows builder documentation](builder/windows/README.md)
+- Source files are in builder/windows, with pinned Electron 44.9.3 and electron-builder 26.15.3 versions.
+- The workflow takes a developer-owned HTTPS URL, app name, accent and window size; it will package an **unsigned** Windows x64 NSIS installer and upload an Actions artifact IF the job succeeds.
+- This code was committed but the actual Windows build/run result has not been verified as successful in this session. **Do not advertise an available .exe until the GitHub job produces one and a Windows installation test passes.**
+- The workflow is **not connected to the web customization form**, does not fetch an uploaded browser icon, and does not authorize a paid export. No customer-triggered builds, entitlements or downloads exist.
+- GitHub repository / Actions artifacts should be treated as potentially public. Only use test websites you own or are permitted to wrap.
+- Windows code signing and Windows SmartScreen trust are not set up. Do not distribute unsigned QA binaries commercially.
+
+**Other platforms:** Android APK and macOS DMG build pipelines remain unimplemented. Do not switch on live Dodo charging before secure, tested build and delivery exists.
