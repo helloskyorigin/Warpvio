@@ -121,7 +121,7 @@ async function uploadIcon(){
     const bytes=Uint8Array.from(binary,ch=>ch.charCodeAt(0));
     const upload=await api('./api/icon-upload',{
       method:'POST',headers:{...headerAuth(),'Content-Type':'application/json'},
-      body:JSON.stringify({id:credentials.id})
+      body:JSON.stringify({id:credentials.id,bytes:bytes.length})
     });
     const put=await fetch(upload.uploadUrl,{
       method:'PUT',headers:{'Content-Type':'image/png'},
