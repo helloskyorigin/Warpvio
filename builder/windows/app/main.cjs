@@ -53,7 +53,11 @@ function createWindow() {
   // Keep the renderer within the originally approved HTTPS origin.
   // External auth providers, popup logins and cross-site navigation are
   // intentionally not supported in this initial QA shell.
-  const allow = (event, destination) => {
+  const allow = (event, legacyUrl) => {
+    // Electron 44+ provides navigation details on the event itself.
+    // Older releases supplied the URL as the second argument.
+    if (event.isMainFrame === false) return;
+    const destination = typeof legacyUrl === 'string' ? legacyUrl : event.url;
     if (!isAllowedNavigation(destination, siteUrl)) event.preventDefault();
   };
   win.webContents.on('will-navigate', allow);
