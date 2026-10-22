@@ -76,7 +76,7 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
           images=(builder/macos/dist/*.dmg)
-          test "$${#images[@]}" -gt 0
+          test "${#images[@]}" -gt 0
           for image in "${images[@]}"; do
             test "$(stat -f %z "$image")" -gt 1000000
             hdiutil verify "$image"
