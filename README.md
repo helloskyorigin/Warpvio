@@ -1,6 +1,6 @@
 # Warpvio — V1 Website Check & App Customization
 
-**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Live payments and customer-facing native exports remain disabled; Windows and Android builders are developer-only QA.**
+**Status:** Responsive landing, real HTTP/HTML website inspection, evidence-based compatibility results, browser-based app customization, preview and a server-backed **one-time checkout preparation flow**. **Live payments and customer-facing native exports remain disabled; Windows, Android and macOS now have developer-only QA build sources.**
 
 ## Current flow
 
@@ -146,3 +146,29 @@ Warpvio now includes a separate Android WebView application, brand/icon/orientat
 - The Warpvio web editor is **not yet connected** to either Android or Windows builders; browser-uploaded icons remain in session storage. There is no authenticated build queue, artifact delivery or payment entitlement.
 
 **macOS DMG builder and production paid exports remain pending.** Secure signing, domain ownership checks, real end-to-end install testing and build orchestration are required before enabling live payments.
+
+
+## macOS QA, saved projects and secure storage foundation
+
+**macOS DMG QA source:** See the [macOS GitHub Actions workflow](https://github.com/helloskyorigin/Warpvio/actions/workflows/macos-qa.yml) and [macOS builder guide](builder/macos/README.md). CI is configured to build Intel x64 and Apple Silicon arm64 DMGs and check disk image integrity. Actual success and installation remain unverified. Apple Developer ID signing and notarization are required for commercial distribution.
+
+**No-login, unpaid project:** From checkout.html choose Save project & verify domain. The project.html interface saves a server-validated 24-hour Upstash draft, supplies a private recovery link and supports TXT verification at the hostname prefixed by _warpvio. Status access requires a 32-byte random bearer token. No email verification or payment entitlement exists. Android currently requires ASCII-compatible app names.
+
+**Custom icon transfer:** Once domain control is verified, users may explicitly upload their selected 256×256 PNG to a PRIVATE Cloudflare R2 bucket using a short-lived signed PUT URL. A HEAD metadata check verifies type and size, not full decoding. Future release workers MUST fully decode and validate the icon again. The deployed Warpvio origin must be allowed by bucket CORS for PUT Content-Type. Without storage settings, uploads fail safely.
+
+**Secure download contract:** The download API can sign a 120-second private R2 GET URL only for a durable order that is domain verified, genuinely payment verified, fulfilled, non-refunded, and has a validated artifact key, checksum and size. No current endpoint grants paid/fulfilled status; all real downloads stay locked.
+
+**Private release worker contract:** Production customer builds are refused unless a verified paid order, domain verification and a confirmed PRIVATE worker repository exist. Existing public QA workflows are intentionally not connected to customer data or orders. Signed release worker jobs, private artifact transfer and verified payment fulfillment must still be built and tested.
+
+## Required deployment and launch configuration
+
+- Vercel: import this repository using the Other framework preset. API functions must run on the same HTTPS origin as the static frontend; GitHub Pages cannot serve them.
+- Upstash: configure UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN server-side for unpaid draft storage and rate limiting.
+- Cloudflare R2: configure a private bucket with R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET; allow PUT via CORS only from the Warpvio deployment origin; configure lifecycle expiration.
+- Dodo: test-mode only with .env.example settings until durable payment idempotency, refunds and production fulfillment exist. A checkout redirect is not payment proof.
+- Private build workers: an entirely separate PRIVATE worker repository, release-signing certificates, secure artifact handoff, and authenticated expiring downloads are required before enabling customer export.
+- Keep all credentials in Vercel/GitHub secret stores. Never put them in public GitHub or paste them into chat.
+- Run npm test at repo root, npm test inside builder/windows and builder/macos, and node --test tests/*.test.cjs inside builder/android.
+- See [Production launch checklist](docs/production-launch-checklist.md).
+
+This is substantial code infrastructure, NOT a fully integrated paid-download service. The public checkout remains safely disabled.
