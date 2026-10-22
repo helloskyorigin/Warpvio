@@ -57,6 +57,7 @@ There are no third-party runtime dependencies for the analysis function.
 - `api/dodo-webhook.js` / `lib/dodo-webhook.js` — signed Dodo webhook **test receiver** (no entitlement)
 - `payment-return.html` — non-entitlement sandbox return page
 - `tests/commerce.test.cjs` — quote, Dodo sandbox and signature-verification tests
+- `tests/checkout.test.cjs` — payment-disabled API and webhook parser safeguards
 - `.env.example` — sandbox configuration template (never store real secrets in Git)
 - `flow.css` — shared analysis/results design
 - `api/analyze.js` — Node serverless URL scanner
