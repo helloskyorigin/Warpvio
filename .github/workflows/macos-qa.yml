@@ -6,6 +6,7 @@ on:
       - "builder/macos/**"
       - "builder/windows/app/**"
       - "builder/windows/scripts/icon.cjs"
+      - ".github/workflows/macos-qa.yml"
   workflow_dispatch:
     inputs:
       website_url:
